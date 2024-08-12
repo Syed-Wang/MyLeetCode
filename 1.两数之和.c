@@ -9,53 +9,92 @@
  * Note: The returned array must be malloced, assume caller calls free().
  */
 
-#include <stdlib.h>
+// 定义哈希表节点
+typedef struct HashNode {
+    int key;
+    int value;
+    struct HashNode* next;
+} HashNode;
 
-// 快速排序
-void quick_sort(int* nums, int left, int right)
+// 哈希函数
+int hashFunction(int key, int size)
 {
-	if (left >= right) {
-		return;
-	}
-	
+    return abs(key) % size; // abs()函数取绝对值
 }
 
-struct object {
-    int val;
-    int index;
-};
-
-static int compare(const void* a, const void* b)
+// 创建哈希表
+HashNode** createHashTable(int size)
 {
-    return ((struct object*)a)->val - ((struct object*)b)->val;
+    HashNode** hashTable = (HashNode**)malloc(size * sizeof(HashNode*));
+
+    // 初始化哈希表
+    for (int i = 0; i < size; ++i) {
+        hashTable[i] = NULL;
+    }
+
+    return hashTable;
+}
+
+// 插入哈希表
+void insertHashTable(HashNode** hashTable, int key, int value, int size)
+{
+    int hashIndex = hashFunction(key, size);
+    HashNode* newNode = (HashNode*)malloc(sizeof(HashNode));
+    newNode->key = key;
+    newNode->value = value;
+    newNode->next = hashTable[hashIndex];
+    hashTable[hashIndex] = newNode;
+}
+
+// 查找哈希表
+HashNode* searchHashTable(HashNode** hashTable, int key, int size)
+{
+    int hashIndex = hashFunction(key, size);
+    HashNode* node = hashTable[hashIndex];
+    while (node != NULL) {
+        if (node->key == key) {
+            return node;
+        }
+        node = node->next;
+    }
+    return NULL;
+}
+
+// 释放哈希表
+void freeHashTable(HashNode** hashTable, int size)
+{
+    for (int i = 0; i < size; ++i) {
+        HashNode* current = hashTable[i];
+        while (current != NULL) {
+            HashNode* temp = current;
+            current = current->next;
+            free(temp);
+        }
+    }
+    free(hashTable);
 }
 
 int* twoSum(int* nums, int numsSize, int target, int* returnSize)
 {
-    int i, j;
-    struct object* objs = malloc(numsSize * sizeof(*objs));
-    for (i = 0; i < numsSize; i++) {
-        objs[i].val = nums[i];
-        objs[i].index = i;
-    }
-    qsort(objs, numsSize, sizeof(*objs), compare);
+    int hashTableSize = numsSize;
+    HashNode** hashTable = createHashTable(hashTableSize);
 
-    int* results = malloc(2 * sizeof(int));
-    i = 0;
-    j = numsSize - 1;
-    while (i < j) {
-        int sum = objs[i].val + objs[j].val;
-        if (sum < target) {
-            i++;
-        } else if (sum > target) {
-            j--;
-        } else {
-            results[0] = objs[i].index;
-            results[1] = objs[j].index;
+    for (int i = 0; i < numsSize; ++i) {
+        int complement = target - nums[i];
+        HashNode* node = searchHashTable(hashTable, complement, hashTableSize);
+        if (node != NULL) {
+            int* results = (int*)malloc(2 * sizeof(int));
+            results[0] = node->value;
+            results[1] = i;
             *returnSize = 2;
+            freeHashTable(hashTable, hashTableSize);
             return results;
         }
+        insertHashTable(hashTable, nums[i], i, hashTableSize);
     }
+
+    *returnSize = 0;
+    freeHashTable(hashTable, hashTableSize);
     return NULL;
 }
 
