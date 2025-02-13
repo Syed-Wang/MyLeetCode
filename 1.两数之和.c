@@ -11,8 +11,8 @@
 
 // 定义哈希表节点
 typedef struct HashNode {
-    int key;
-    int value;
+    int key; // 存放数组元素
+    int value; // 存放数组下标
     struct HashNode* next;
 } HashNode;
 
