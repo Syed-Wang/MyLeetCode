@@ -8,26 +8,23 @@
 # @lc code=start
 class Solution:
     def romanToInt(self, s: str) -> int:
-        rome = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
-        str_len = len(s)
-        if str_len == 1:
-            return rome[s]
+        """解题思路：
+        1. 从右到左遍历字符串，记录当前字符的值和前一个字符的值
+        2. 如果当前字符的值小于前一个字符的值，则减去当前字符的值，否则加上当前字符的值
+        """
+        roman_values = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+        total = 0
+        prev_value = 0
 
-        num = 0
-        i = 0
-        while i < str_len:
-            if i == str_len - 1:
-                num += rome[s[i]]
-                return num
-            elif rome[s[i]] >= rome[s[i + 1]]:
-                num += rome[s[i]]
-                i += 1
+        for char in reversed(s):
+            current_value = roman_values[char]
+            if current_value < prev_value:
+                total -= current_value
             else:
-                num += rome[s[i + 1]] - rome[s[i]]
-                if i + 2 < str_len:
-                    i += 2
-                else:
-                    return num
+                total += current_value
+            prev_value = current_value
+
+        return total
 
 
 # @lc code=end
