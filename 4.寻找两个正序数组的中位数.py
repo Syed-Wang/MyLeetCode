@@ -27,7 +27,7 @@ class Solution:
         # 找分割点
         while imin <= imax:
             i = (imin + imax) // 2  # nums1分到左半部分的元素个数
-            j = half_len - i
+            j = half_len - i  # nums2分到左半部分的元素个数
 
             if i < m and nums2[j - 1] > nums1[i]:  # 先检查i边界条件
                 imin = i + 1
